@@ -10,5 +10,5 @@ when defined(release):
   switch("d", "windows")
 
   put "vcc.linkerexe", "crinkler.exe"
-  put "vcc.options.always", "--platform:x86 /nologo /Ob2 /Oi /Os"
+  put "vcc.options.always", "--platform:x86 /nologo /Ob2 /Oi /Os /GS-"
   put "vcc.options.linker", "/SUBSYSTEM:WINDOWS /OUT:" & projectName().toExe()
