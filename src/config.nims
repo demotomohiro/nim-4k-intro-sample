@@ -1,4 +1,5 @@
 --cc:vcc
+--d:noAutoGLerrorCheck
 when defined(release):
   --cpu:i386
   --os:standalone

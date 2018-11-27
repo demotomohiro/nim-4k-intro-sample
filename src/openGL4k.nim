@@ -14,3 +14,7 @@ include opengl/private/types,
 
 proc glGetString4k*(name: GLenum):  ptr GLubyte {.
     stdcall, dynlib: "opengl32", importc: "glGetString".}
+proc glClearSttc*(mask: GLbitfield) {.
+    stdcall, dynlib: "opengl32", importc: "glClear".}
+proc glDrawArraysSttc*(mode: GLenum, first: GLint, count: GLsizei) {.
+    stdcall, dynlib: "opengl32", importc: "glDrawArrays".}
