@@ -136,6 +136,7 @@ const triangleVSSrc = staticRead("triangle.vs").cstring
 const triangleFSSrc = staticRead("triangle.fs").cstring
 
 var triangleProgObj: GLuint
+var sampleCountUniformLoc: GLint
 
 proc initScene() =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
@@ -144,7 +145,9 @@ proc initScene() =
   glAttachShader(progObj, vso)
   glAttachShader(progObj, fso)
   progObj.linkProgramObj()
-#  glUseProgram(progObj)
+  glUseProgram(progObj)
+  sampleCountUniformLoc = glGetUniformLocation(progObj, "sampleCount".cstring)
+  assert sampleCountUniformLoc != -1
   triangleProgObj = progObj
 
 const WAVE_FORMAT_IEEE_FLOAT: int16 = 0x0003
@@ -199,6 +202,8 @@ template checkWaveOutCall(call: typed): untyped =
       else:
         quit "Failed to call waveOutGetErrorText"
 
+var h_wave_out: HWAVEOUT
+
 proc initSound() =
   let cso = createShader(soundCSSrc, GL_COMPUTE_SHADER)
   let progObj = glCreateProgram()
@@ -220,13 +225,19 @@ proc initSound() =
     for i in 0..<8:
       echo samples[i]
 
-  var h_wave_out: HWAVEOUT
   var wf = wave_format
   checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
   var wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
+
+proc getSoundPosition(): float32 =
+  var mmtime: MMTIME
+  mmtime.wType = TIME_SAMPLES
+
+  checkWaveOutCall(waveOutGetPosition(h_wave_out, addr mmtime, sizeof(mmtime).uint32))
+  return float32((cast[ptr array[2, uint32]](addr mmtime))[][1])
 
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
@@ -240,7 +251,9 @@ proc WinMainCRTStartup() {.exportc.} =
   while true:
     discard PeekMessage(addr msg, 0, 0, 0, PM_REMOVE)
     glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+    let pos: float32 = getSoundPosition()
     glUseProgram(triangleProgObj)
+    glUniform1f(sampleCountUniformLoc, pos)
     glDrawArraysSttc(GL_TRIANGLES, 0, 3)
     discard SwapBuffers(hdc)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
