@@ -1,7 +1,7 @@
 --cc:vcc
 --d:noAutoGLerrorCheck
+--cpu:i386
 when defined(release):
-  --cpu:i386
   --os:standalone
   --gc:none
   --dynlibOverrideAll
@@ -13,3 +13,6 @@ when defined(release):
   put "vcc.linkerexe", "crinkler.exe"
   put "vcc.options.always", "--platform:x86 /nologo /Ob2 /Oi /Os /GS-"
   put "vcc.options.linker", "/SUBSYSTEM:WINDOWS /OUT:" & projectName().toExe()
+else:
+  put "vcc.options.always", "--platform:x86 /nologo /Z7"
+  put "vcc.options.linker", "--platform:x86 /nologo /DEBUG /Zi"
