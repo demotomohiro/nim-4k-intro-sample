@@ -214,6 +214,7 @@ proc initSound() =
   glDispatchCompute(
     GLuint(int(soundNumSamples + soundCSLocalSize - 1) div soundCSLocalSize), 1, 1)
 
+  glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT)
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
   when not defined(release):
     for i in 0..<8:
