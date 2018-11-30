@@ -147,8 +147,6 @@ proc initScene() =
 #  glUseProgram(progObj)
   triangleProgObj = progObj
 
-const WAVE_FORMAT_IEEE_FLOAT: int16 = 0x0003
-
 type SampleType = float32
 
 const
@@ -156,29 +154,6 @@ const
   soundLengthInSecond = 60
   soundNumChannels    = 2
   soundNumSamples     = soundSampleRate * soundLengthInSecond
-  wave_format = WAVEFORMATEX(
-    wFormatTag:       WAVE_FORMAT_IEEE_FLOAT,
-    nChannels:        soundNumChannels,
-    nSamplesPerSec:   soundSampleRate,
-    nAvgBytesPerSec:  soundSampleRate*sizeof(SampleType)*soundNumChannels,
-    nBlockAlign:      sizeof(SampleType)*soundNumChannels,
-    wBitsPerSample:   sizeof(SampleType)*8,
-    cbSize:           0
-  )
-
-var samples: array[soundNumSamples * soundNumChannels, SampleType]
-
-const
-  wave_hdr = WAVEHDR(
-    lpData:           nil,
-    dwBufferLength:   sizeof(samples).int32,
-    dwBytesRecorded:  0,
-    dwUser:           0,
-    dwFlags:          0,
-    dwLoops:          0,
-    lpNext:           nil,
-    reserved:         0
-  )
 
 const soundCSLocalSize = 32
 const soundCSSrc = (staticRead("../shaders/sound.cs") % [
@@ -187,17 +162,23 @@ const soundCSSrc = (staticRead("../shaders/sound.cs") % [
                                               "soundSampleRate", $soundSampleRate
                                               ]).cstring
 
-template checkWaveOutCall(call: typed): untyped =
-  when defined(release):
-    discard call
-  else:
-    let r = call
-    if r != MMSYSERR_NOERROR:
-      var text: array[MAXERRORLENGTH, Utf16Char]
-      if waveOutGetErrorTextW(r, cast[LPWSTR](addr text[0]), MAXERRORLENGTH.uint32) != MMSYSERR_NOERROR:
-        echo cast[WideCString](addr text[0])
-      else:
-        quit "Failed to call waveOutGetErrorText"
+proc genSoundC(): string =
+  let outf = "sound.gen.c"
+  when not defined(release):
+    var text = readFile("sound.c")
+    text = text % [
+                   "SOUND_SAMPLE_RATE",      $soundSampleRate,
+                   "SOUND_LENGTH_IN_SECOND", $soundLengthInSecond,
+                   "SOUND_NUM_CHANNELS",     $soundNumChannels,
+                   "SOUND_NUM_SAMPLES",      $soundNumSamples]
+    writeFile(outf, text)
+  return outf
+
+const soundC = genSoundC()
+{.compile: soundC.}
+
+proc getSampleBuf(): pointer {.importc.}
+proc playSound(hWnd: HWND) {.importc.}
 
 proc initSound() =
   let cso = createShader(soundCSSrc, GL_COMPUTE_SHADER)
@@ -205,9 +186,10 @@ proc initSound() =
   glAttachShader(progObj, cso)
   progObj.linkProgramObj()
 
+  const sampleSize = sizeof(array[soundNumSamples * soundNumChannels, SampleType])
   var ssbo: GLuint
   glCreateBuffers(1, addr ssbo)
-  glNamedBufferData(ssbo, sizeof(samples), nil, GL_DYNAMIC_READ)
+  glNamedBufferData(ssbo, sampleSize, nil, GL_DYNAMIC_READ)
   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo)
 
   glUseProgram(progObj)
@@ -215,18 +197,9 @@ proc initSound() =
     GLuint(int(soundNumSamples + soundCSLocalSize - 1) div soundCSLocalSize), 1, 1)
 
   glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT)
-  glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
-  when not defined(release):
-    for i in 0..<8:
-      echo samples[i]
+  glGetNamedBufferSubData(ssbo, 0, sampleSize, getSampleBuf())
 
-  var h_wave_out: HWAVEOUT
-  var wf = wave_format
-  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
-  var wh = wave_hdr
-  wh.lpData = cast[cstring](addr samples[0])
-  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
-  checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
+  playSound(hWnd)
 
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
