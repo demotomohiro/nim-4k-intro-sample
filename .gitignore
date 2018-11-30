@@ -1,1 +1,5 @@
 nimcache/
+*.o
+*.exe
+*.ilk
+*.pdb
