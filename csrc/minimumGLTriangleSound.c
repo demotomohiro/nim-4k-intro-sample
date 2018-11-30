@@ -72,9 +72,9 @@ static PIXELFORMATDESCRIPTOR pfd =
 HWND hWnd;
 
 HDC initScreen() {
-	hWnd =	CreateWindowW(L"STATIC", 0,
+	hWnd =	CreateWindowA("STATIC", 0,
 		WS_POPUP|WS_VISIBLE, 0, 0,
-		WIDTH, HEIGHT, NULL, NULL, NULL,NULL);
+		WIDTH, HEIGHT, NULL, NULL, NULL, NULL);
 
 	HDC hdc = GetDC(hWnd);
 
