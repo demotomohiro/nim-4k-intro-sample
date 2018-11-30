@@ -132,8 +132,8 @@ proc linkProgramObj(progObj: GLuint) =
     if success != cast[GLint](GL_TRUE):
       quit "Failed to link shader"
 
-const triangleVSSrc = staticRead("triangle.vs").cstring
-const triangleFSSrc = staticRead("triangle.fs").cstring
+const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
+const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 var triangleProgObj: GLuint
 
@@ -181,7 +181,7 @@ const
   )
 
 const soundCSLocalSize = 32
-const soundCSSrc = (staticRead("sound.cs") % [
+const soundCSSrc = (staticRead("../shaders/sound.cs") % [
                                               "soundNumSamples", $soundNumSamples,
                                               "soundCSLocalSize", $soundCSLocalSize,
                                               "soundSampleRate", $soundSampleRate
