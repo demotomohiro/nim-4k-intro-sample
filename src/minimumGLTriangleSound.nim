@@ -132,10 +132,11 @@ proc linkProgramObj(progObj: GLuint) =
     if success != cast[GLint](GL_TRUE):
       quit "Failed to link shader"
 
-const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
+const triangleVSSrc = staticRead("../shaders/triangleAnim.vs").cstring
 const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 var triangleProgObj: GLuint
+var timeUniformLoc: GLint
 
 proc initScene() =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
@@ -144,7 +145,9 @@ proc initScene() =
   glAttachShader(progObj, vso)
   glAttachShader(progObj, fso)
   progObj.linkProgramObj()
-#  glUseProgram(progObj)
+  glUseProgram(progObj)
+  timeUniformLoc = glGetUniformLocation(progObj, "time")
+  assert(timeUniformLoc != -1)
   triangleProgObj = progObj
 
 type SampleType = float32
@@ -179,6 +182,7 @@ const soundC = genSoundC()
 
 proc getSampleBuf(): pointer {.importc.}
 proc playSound(hWnd: HWND) {.importc.}
+proc getSoundPosition(): float32 {.importc.}
 
 proc initSound() =
   let cso = createShader(soundCSSrc, GL_COMPUTE_SHADER)
@@ -201,6 +205,13 @@ proc initSound() =
 
   playSound(hWnd)
 
+proc render() =
+  glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+  glUseProgram(triangleProgObj)
+  let pos = getSoundPosition()
+  glUniform1f(timeUniformLoc, pos)
+  glDrawArraysSttc(GL_TRIANGLES, 0, 3)
+
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
   initScene()
@@ -212,9 +223,7 @@ proc WinMainCRTStartup() {.exportc.} =
 
   while true:
     discard PeekMessage(addr msg, 0, 0, 0, PM_REMOVE)
-    glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-    glUseProgram(triangleProgObj)
-    glDrawArraysSttc(GL_TRIANGLES, 0, 3)
+    render()
     discard SwapBuffers(hdc)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
       ExitProcess(0)

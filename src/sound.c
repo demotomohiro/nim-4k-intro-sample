@@ -30,13 +30,31 @@ WAVEHDR wave_hdr =
 	0
 };
 
+HWAVEOUT h_wave_out;
+
 void* __fastcall getSampleBuf() {
   return (void*)samples;
 }
 
 void __fastcall playSound(HWND hWnd) {
-  HWAVEOUT h_wave_out;
 	waveOutOpen(&h_wave_out, WAVE_MAPPER, &wave_format, (DWORD_PTR)hWnd, 0, CALLBACK_WINDOW);
 	waveOutPrepareHeader(h_wave_out, &wave_hdr, sizeof(wave_hdr));
 	waveOutWrite(h_wave_out, &wave_hdr, sizeof(wave_hdr));
+}
+
+float __fastcall getSoundPosition()
+{
+	MMRESULT r;
+
+	MMTIME mmtime =
+	{
+		TIME_SAMPLES,
+		0
+	};
+
+	r = waveOutGetPosition(h_wave_out, &mmtime, sizeof(mmtime));
+//	assert(r==MMSYSERR_NOERROR);
+//	assert(mmtime.wType==TIME_SAMPLES);
+
+	return (float)(mmtime.u.sample) / $soundSampleRate;
 }
