@@ -1,4 +1,4 @@
-import oldwinapi/[windows, mmsystem]
+import winim4k/inc/[winbase, windef, winuser, mmsystem]
 include openGL4k
 include strutils_tmp
 
@@ -9,8 +9,8 @@ const
   ScreenWidth   = 640
   ScreenHeight  = 480
   pfd           = PIXELFORMATDESCRIPTOR(
-    nSize:          sizeof(PIXELFORMATDESCRIPTOR).int16,
-    nVersion:       1'i16,
+    nSize:          sizeof(PIXELFORMATDESCRIPTOR).uint16,
+    nVersion:       1'u16,
     dwFlags:        PFD_DRAW_TO_WINDOW or
                     PFD_SUPPORT_OPENGL or
                     PFD_DOUBLEBUFFER,
@@ -157,7 +157,7 @@ const
   soundNumChannels    = 2
   soundNumSamples     = soundSampleRate * soundLengthInSecond
   wave_format = WAVEFORMATEX(
-    wFormatTag:       WAVE_FORMAT_IEEE_FLOAT,
+    wFormatTag:       WAVE_FORMAT_IEEE_FLOAT.uint16,
     nChannels:        soundNumChannels,
     nSamplesPerSec:   soundSampleRate,
     nAvgBytesPerSec:  soundSampleRate*sizeof(SampleType)*soundNumChannels,
@@ -194,7 +194,7 @@ template checkWaveOutCall(call: typed): untyped =
     let r = call
     if r != MMSYSERR_NOERROR:
       var text: array[MAXERRORLENGTH, Utf16Char]
-      if waveOutGetErrorTextW(r, cast[LPWSTR](addr text[0]), MAXERRORLENGTH.uint32) != MMSYSERR_NOERROR:
+      if waveOutGetErrorTextW(r, cast[LPWSTR](addr text[0]), MAXERRORLENGTH.UINT) != MMSYSERR_NOERROR:
         echo cast[WideCString](addr text[0])
       else:
         quit "Failed to call waveOutGetErrorText"
@@ -225,8 +225,8 @@ proc initSound() =
   checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
   var wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
-  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
-  checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).uint32))
+  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
+  checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
 
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
