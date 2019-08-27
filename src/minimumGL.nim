@@ -1,12 +1,12 @@
-import oldwinapi/windows
+import winim4k/inc/[winbase, windef, winuser]
 include openGL4k
 
 const
   ScreenWidth   = 640
   ScreenHeight  = 480
   pfd           = PIXELFORMATDESCRIPTOR(
-    nSize:          sizeof(PIXELFORMATDESCRIPTOR).int16,
-    nVersion:       1'i16,
+    nSize:          sizeof(PIXELFORMATDESCRIPTOR).uint16,
+    nVersion:       1'u16,
     dwFlags:        PFD_DRAW_TO_WINDOW or
                     PFD_SUPPORT_OPENGL or
                     PFD_DOUBLEBUFFER,

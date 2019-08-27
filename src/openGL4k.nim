@@ -1,3 +1,5 @@
+import winim4k/inc/wingdi
+
 {.pragma: ogl, dynlib: wglGetProcAddress("0").}
 {.pragma: wgl, dynlib: wglGetProcAddress("0").}
 
