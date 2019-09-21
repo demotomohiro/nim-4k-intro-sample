@@ -1,0 +1,3 @@
+put "vcc.options.always", get("vcc.options.always") & " /fp:fast /arch:IA32"
+when defined(release):
+  --passL:user32.lib kernel32.lib winmm.lib
