@@ -1,9 +1,6 @@
 import winim4k/inc/[winbase, windef, winuser]
 include openGL4k
 
-wrapErrorChecking:
-  proc wglSwapIntervalEXT(interval: GLint): WINBOOL
-
 const
   ScreenWidth   = 640
   ScreenHeight  = 480

@@ -32,3 +32,5 @@ proc glDrawArraysSttc*(mode: GLenum, first: GLint, count: GLsizei) {.
 
 proc glEnableSttc*(cap: GLenum) {.
     stdcall, dynlib: "opengl32", importc: "glEnable".}
+
+proc wglSwapIntervalEXT*(interval: cint): BOOL{.stdcall, wgl, importc.}
