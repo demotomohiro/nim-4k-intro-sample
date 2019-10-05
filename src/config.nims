@@ -11,9 +11,6 @@ when defined(release):
   switch("d", "windows")
 
   put "vcc.linkerexe", "crinkler.exe"
-  put "vcc.options.always", "--platform:x86 /nologo /Ob2 /Oi /Os /GS-"
+  put "vcc.options.always", "/nologo /Ob2 /Oi /Os /GS-"
   put "vcc.options.linker", "/SUBSYSTEM:WINDOWS"
-  put "vcc.linkTmpl", "$options /OUT:$exefile $objfiles"
-else:
-  put "vcc.options.always", "--platform:x86 /nologo /Z7"
-  put "vcc.options.linker", "--platform:x86 /nologo /DEBUG /Zi"
+  put "vcc.linkTmpl", "$options /OUT:$exefile.exe $objfiles"
