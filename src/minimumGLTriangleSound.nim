@@ -177,6 +177,9 @@ const
     reserved:         0
   )
 
+#wh can be modified by waveOutWrite when the buffer is finished.
+var wh: WAVEHDR
+
 const soundCSLocalSize = 32
 const soundCSSrc = (staticRead("../shaders/sound.cs") % [
                                               "soundNumSamples", $soundNumSamples,
@@ -220,7 +223,7 @@ proc initSound() =
   var h_wave_out: HWAVEOUT
   var wf = wave_format
   checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
-  var wh = wave_hdr
+  wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
