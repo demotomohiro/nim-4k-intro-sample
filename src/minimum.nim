@@ -1,4 +1,4 @@
-import winim4k/inc/winuser
+import winlean4k
 
 proc WinMainCRTStartup() {.exportc.} =
   discard MessageBoxA(0, cstring"foobar", cstring"title", 0)
