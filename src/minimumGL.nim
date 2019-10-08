@@ -1,4 +1,4 @@
-import winim4k/inc/[winbase, windef, winuser]
+import winlean4k
 include openGL4k
 
 const
@@ -34,7 +34,7 @@ proc initScreen() =
   let hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
-    ScreenWidth, ScreenHeight, 0, 0, 0, nil)
+    ScreenWidth, ScreenHeight, nil, nil, nil, nil)
   let hdc = GetDC(hWnd)
 
   var varPfd = pfd
@@ -45,7 +45,7 @@ proc initScreen() =
 proc WinMainCRTStartup() {.exportc.} =
   initScreen()
   let version = glGetString4k(GL_VERSION)
-  discard MessageBoxA(0, cast[LPCSTR](version), cstring"minimumGL", 0)
+  discard MessageBoxA(nil, cast[cstring](version), cstring"minimumGL", 0)
   # Process keep alive if ExitProcess API was not called.
   ExitProcess(0)
 

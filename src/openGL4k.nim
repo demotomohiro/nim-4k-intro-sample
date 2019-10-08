@@ -1,5 +1,3 @@
-import winim4k/inc/wingdi
-
 {.pragma: ogl, dynlib: wglGetProcAddress("0").}
 {.pragma: wgl, dynlib: wglGetProcAddress("0").}
 
@@ -33,4 +31,4 @@ proc glDrawArraysSttc*(mode: GLenum, first: GLint, count: GLsizei) {.
 proc glEnableSttc*(cap: GLenum) {.
     stdcall, dynlib: "opengl32", importc: "glEnable".}
 
-proc wglSwapIntervalEXT*(interval: cint): BOOL{.stdcall, wgl, importc.}
+proc wglSwapIntervalEXT*(interval: cint): WINBOOL{.stdcall, wgl, importc.}
