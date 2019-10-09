@@ -1,4 +1,4 @@
-import winim4k/inc/[winbase, windef, winuser]
+import winlean4k
 include openGL4k
 
 const
@@ -34,7 +34,7 @@ proc initScreen(): auto =
   let hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
-    ScreenWidth, ScreenHeight, 0, 0, 0, nil)
+    ScreenWidth, ScreenHeight, nil, nil, nil, nil)
   let hdc = GetDC(hWnd)
 
   var varPfd = pfd
@@ -102,7 +102,7 @@ proc WinMainCRTStartup() {.exportc.} =
   var msg: MSG
 
   while true:
-    discard PeekMessage(addr msg, 0, 0, 0, PM_REMOVE)
+    discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
     glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     glDrawArraysSttc(GL_TRIANGLES, 0, 3)
     discard SwapBuffers(hdc)
