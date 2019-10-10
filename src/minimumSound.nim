@@ -1,4 +1,4 @@
-import winim4k/inc/[winbase, windef, winuser, mmsystem]
+import winlean4k
 import math
 
 type SampleType = float32
@@ -23,7 +23,7 @@ var samples: array[soundNumSamples * soundNumChannels, SampleType]
 const
   wave_hdr = WAVEHDR(
     lpData:           nil,
-    dwBufferLength:   sizeof(samples).int32,
+    dwBufferLength:   sizeof(samples).uint32,
     dwBytesRecorded:  0,
     dwUser:           0,
     dwFlags:          0,
@@ -39,7 +39,7 @@ template checkWaveOutCall(call: typed): untyped =
     let r = call
     if r != MMSYSERR_NOERROR:
       var text: array[MAXERRORLENGTH, Utf16Char]
-      if waveOutGetErrorTextW(r, cast[LPWSTR](addr text[0]), MAXERRORLENGTH.UINT) != MMSYSERR_NOERROR:
+      if waveOutGetErrorTextW(r, addr text[0], MAXERRORLENGTH.UINT) != MMSYSERR_NOERROR:
         echo cast[WideCString](addr text[0])
       else:
         quit "Failed to call waveOutGetErrorText"
@@ -48,7 +48,7 @@ proc WinMainCRTStartup() {.exportc.} =
   let hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
-    640, 480, 0, 0, 0, nil)
+    640, 480, nil, nil, nil, nil)
 
   for i in 0..<soundNumSamples:
     let
@@ -68,7 +68,7 @@ proc WinMainCRTStartup() {.exportc.} =
   var msg: MSG
 
   while true:
-    discard PeekMessage(addr msg, 0, 0, 0, PM_REMOVE)
+    discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
       ExitProcess(0)
     Sleep(256);
