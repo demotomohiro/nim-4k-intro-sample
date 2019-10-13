@@ -216,9 +216,6 @@ proc initSound() =
 
   glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT)
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
-  when not defined(release):
-    for i in 0..<8:
-      echo samples[i]
 
   var h_wave_out: HWAVEOUT
   var wf = wave_format
