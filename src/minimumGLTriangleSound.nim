@@ -1,4 +1,4 @@
-import winim4k/inc/[winbase, windef, winuser, mmsystem]
+import winlean4k
 include openGL4k
 include strutils_tmp
 
@@ -57,7 +57,7 @@ proc initScreen(): auto =
   hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
-    ScreenWidth, ScreenHeight, 0, 0, 0, nil)
+    ScreenWidth, ScreenHeight, nil, nil, nil, nil)
   let hdc = GetDC(hWnd)
 
   var varPfd = pfd
@@ -74,8 +74,8 @@ proc initScreen(): auto =
     if wglCreateContextAttribsARB == nil:
       quit "wglCreateContextAttribsARB is not available"
     var al = attribList
-    let hglrc = wglCreateContextAttribsARB(hdc, 0, addr(al[0]))
-    assert hglrc != 0
+    let hglrc = wglCreateContextAttribsARB(hdc, nil, addr(al[0]))
+    assert hglrc != nil
     discard wglMakeCurrent(hdc, hglrc)
 
   loadExtensions()
@@ -168,7 +168,7 @@ var samples: array[soundNumSamples * soundNumChannels, SampleType]
 const
   wave_hdr = WAVEHDR(
     lpData:           nil,
-    dwBufferLength:   sizeof(samples).int32,
+    dwBufferLength:   sizeof(samples).uint32,
     dwBytesRecorded:  0,
     dwUser:           0,
     dwFlags:          0,
@@ -194,7 +194,7 @@ template checkWaveOutCall(call: typed): untyped =
     let r = call
     if r != MMSYSERR_NOERROR:
       var text: array[MAXERRORLENGTH, Utf16Char]
-      if waveOutGetErrorTextW(r, cast[LPWSTR](addr text[0]), MAXERRORLENGTH.UINT) != MMSYSERR_NOERROR:
+      if waveOutGetErrorTextW(r, addr text[0], MAXERRORLENGTH.UINT) != MMSYSERR_NOERROR:
         echo cast[WideCString](addr text[0])
       else:
         quit "Failed to call waveOutGetErrorText"
@@ -238,7 +238,7 @@ proc WinMainCRTStartup() {.exportc.} =
   var msg: MSG
 
   while true:
-    discard PeekMessage(addr msg, 0, 0, 0, PM_REMOVE)
+    discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
     glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     glUseProgram(triangleProgObj)
     glDrawArraysSttc(GL_TRIANGLES, 0, 3)
