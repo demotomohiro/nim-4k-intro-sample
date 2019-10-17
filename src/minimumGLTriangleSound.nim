@@ -129,7 +129,10 @@ proc linkProgramObj(progObj: GLuint) =
     if success != cast[GLint](GL_TRUE):
       quit "Failed to link shader"
 
-const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
+const shaderTimeLoc = 1
+const triangleVSSrc = (staticRead("../shaders/triangleAnim.vs") % [
+                                              "shaderTimeLoc", $shaderTimeLoc
+                                                                  ]).cstring
 const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 var triangleProgObj: GLuint
@@ -199,6 +202,8 @@ template checkWaveOutCall(call: typed): untyped =
       else:
         quit "Failed to call waveOutGetErrorText"
 
+var h_wave_out: HWAVEOUT
+
 proc initSound() =
   let cso = createShader(soundCSSrc, GL_COMPUTE_SHADER)
   let progObj = glCreateProgram()
@@ -217,13 +222,19 @@ proc initSound() =
   glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT)
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
 
-  var h_wave_out: HWAVEOUT
   var wf = wave_format
   checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
   wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
+
+proc getSoundPosition(): float32 =
+  var mmtime: MMTIME
+  mmtime.wType = TIME_SAMPLES
+
+  checkWaveOutCall(waveOutGetPosition(h_wave_out, addr mmtime, sizeof(mmtime).uint32))
+  return float32(mmtime.u.sample) / float32(soundSampleRate)
 
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
@@ -238,6 +249,8 @@ proc WinMainCRTStartup() {.exportc.} =
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
     glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     glUseProgram(triangleProgObj)
+    let pos = getSoundPosition()
+    glUniform1f(shaderTimeLoc, pos)
     glDrawArraysSttc(GL_TRIANGLES, 0, 3)
     discard SwapBuffers(hdc)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
