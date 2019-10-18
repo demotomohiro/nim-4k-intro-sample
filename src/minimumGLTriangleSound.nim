@@ -155,7 +155,7 @@ const
   soundNumChannels    = 2
   soundNumSamples     = soundSampleRate * soundLengthInSecond
   wave_format = WAVEFORMATEX(
-    wFormatTag:       WAVE_FORMAT_IEEE_FLOAT.uint16,
+    wFormatTag:       WAVE_FORMAT_IEEE_FLOAT,
     nChannels:        soundNumChannels,
     nSamplesPerSec:   soundSampleRate,
     nAvgBytesPerSec:  soundSampleRate*sizeof(SampleType)*soundNumChannels,
