@@ -147,8 +147,6 @@ proc initScene() =
 #  glUseProgram(progObj)
   triangleProgObj = progObj
 
-const WAVE_FORMAT_IEEE_FLOAT: int16 = 0x0003
-
 type SampleType = float32
 
 const
