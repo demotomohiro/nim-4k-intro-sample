@@ -221,7 +221,7 @@ proc initSound() =
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
 
   var wf = wave_format
-  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD](hWnd), 0.DWORD, CALLBACK_WINDOW.DWORD))
+  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD_PTR](hWnd), 0.DWORD_PTR, CALLBACK_WINDOW.DWORD))
   wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
