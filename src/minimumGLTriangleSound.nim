@@ -3,8 +3,8 @@ include openGL4k
 include strutils_tmp
 
 const
-  ScreenWidth   = 640
-  ScreenHeight  = 480
+  ScreenWidth  {.intdefine.} = 640
+  ScreenHeight {.intdefine.} = 480
   pfd           = PIXELFORMATDESCRIPTOR(
     nSize:          sizeof(PIXELFORMATDESCRIPTOR).uint16,
     nVersion:       1'u16,
