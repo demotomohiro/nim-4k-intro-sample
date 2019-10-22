@@ -28,6 +28,7 @@ PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 PFNGLMEMORYBARRIERPROC glMemoryBarrier;
 PFNGLGETNAMEDBUFFERSUBDATAPROC glGetNamedBufferSubData;
+PFNGLUNIFORM1FPROC glUniform1f;
 
 void loadExtensions() {
   glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
@@ -44,6 +45,7 @@ void loadExtensions() {
   glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)wglGetProcAddress("glDispatchCompute");
   glMemoryBarrier = (PFNGLMEMORYBARRIERPROC)wglGetProcAddress("glMemoryBarrier");
   glGetNamedBufferSubData = (PFNGLGETNAMEDBUFFERSUBDATAPROC)wglGetProcAddress("glGetNamedBufferSubData");
+  glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
 }
 
 static PIXELFORMATDESCRIPTOR pfd =
@@ -98,13 +100,15 @@ void linkProgramObj(GLuint progObj) {
   glLinkProgram(progObj);
 }
 
-#include "../shaders/triangle.vs.h"
+#define SHADER_TIME_LOC 1
+
+#include "../shaders/triangleAnim.vs.h"
 #include "../shaders/triangle.fs.h"
 
 GLuint triangleProgObj;
 
 void initScene() {
-  GLuint vso = createShader(triangle_vs, GL_VERTEX_SHADER);
+  GLuint vso = createShader(triangleAnim_vs, GL_VERTEX_SHADER);
   GLuint fso = createShader(triangle_fs, GL_FRAGMENT_SHADER);
   GLuint progObj = glCreateProgram();
   glAttachShader(progObj, vso);
@@ -151,6 +155,8 @@ WAVEHDR wave_hdr =
 
 #include "../shaders/sound.cs.h"
 
+HWAVEOUT h_wave_out;
+
 void initSound() {
   GLuint cso = createShader(sound_cs, GL_COMPUTE_SHADER);
   GLuint progObj = glCreateProgram();
@@ -169,10 +175,23 @@ void initSound() {
   glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT);
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), samples);
 
-  HWAVEOUT h_wave_out;
 	waveOutOpen(&h_wave_out, WAVE_MAPPER, &wave_format, (DWORD_PTR)hWnd, 0, CALLBACK_WINDOW);
 	waveOutPrepareHeader(h_wave_out, &wave_hdr, sizeof(wave_hdr));
 	waveOutWrite(h_wave_out, &wave_hdr, sizeof(wave_hdr));
+}
+
+float getSoundPosition() {
+	MMRESULT r;
+
+	MMTIME mmtime =
+	{
+		TIME_SAMPLES,
+		0
+	};
+
+	r = waveOutGetPosition(h_wave_out, &mmtime, sizeof(mmtime));
+
+	return (float)(mmtime.u.sample) / (float)SOUND_SAMPLE_RATE;
 }
 
 void WinMainCRTStartup(void) {
@@ -187,6 +206,8 @@ loop:
 	PeekMessage(&msg, 0, 0, 0, PM_REMOVE);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glUseProgram(triangleProgObj);
+  float pos = getSoundPosition();
+  glUniform1f(SHADER_TIME_LOC, pos);
   glDrawArrays(GL_TRIANGLES, 0, 3);
 	SwapBuffers(hdc);
 	if(GetAsyncKeyState(VK_ESCAPE) || msg.message == MM_WOM_DONE)

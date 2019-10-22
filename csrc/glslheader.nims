@@ -7,10 +7,12 @@ proc processGLSL(text: string): string =
     soundLengthInSecond = 60
     soundNumSamples     = soundSampleRate * soundLengthInSecond
     soundCSLocalSize    = 32
+    shaderTimeLoc       = 1
 
-  text % [ "soundNumSamples", $soundNumSamples,
+  text % ["soundNumSamples", $soundNumSamples,
           "soundCSLocalSize", $soundCSLocalSize,
-          "soundSampleRate", $soundSampleRate
+          "soundSampleRate", $soundSampleRate,
+          "shaderTimeLoc", $shaderTimeLoc
           ]
 
 proc toCVar(text: string): string =
