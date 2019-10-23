@@ -21,7 +21,7 @@ PFNGLATTACHSHADERPROC glAttachShader;
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
 
-void loadExtensions() {
+__forceinline void loadExtensions() {
   glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
   glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
   glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
@@ -55,7 +55,7 @@ static PIXELFORMATDESCRIPTOR pfd =
 	0, 0, 0
 };
 
-HDC initScreen() {
+__forceinline HDC initScreen() {
 	HWND hWnd =	CreateWindowA("STATIC", 0,
 		WS_POPUP|WS_VISIBLE, 0, 0,
 		WIDTH, HEIGHT, NULL, NULL, NULL,NULL);
@@ -70,7 +70,7 @@ HDC initScreen() {
   return hdc;
 }
 
-GLuint createShader(const char* source, GLenum shaderType) {
+__forceinline GLuint createShader(const char* source, GLenum shaderType) {
   GLenum result = glCreateShader(shaderType);
   glShaderSource(result, 1, (const GLchar**)&source, NULL);
   glCompileShader(result);
@@ -78,14 +78,14 @@ GLuint createShader(const char* source, GLenum shaderType) {
   return result;
 }
 
-void linkProgramObj(GLuint progObj) {
+__forceinline void linkProgramObj(GLuint progObj) {
   glLinkProgram(progObj);
 }
 
 #include "../shaders/triangle.vs.h"
 #include "../shaders/triangle.fs.h"
 
-void initScene() {
+__forceinline void initScene() {
   GLuint vso = createShader(triangle_vs, GL_VERTEX_SHADER);
   GLuint fso = createShader(triangle_fs, GL_FRAGMENT_SHADER);
   GLuint progObj = glCreateProgram();
