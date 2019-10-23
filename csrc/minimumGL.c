@@ -34,7 +34,7 @@ static PIXELFORMATDESCRIPTOR pfd =
 	0, 0, 0
 };
 
-void initScreen() {
+__forceinline void initScreen() {
 	HWND hWnd =	CreateWindowA("STATIC", 0,
 		WS_POPUP|WS_VISIBLE, 0, 0,
 		WIDTH, HEIGHT, NULL, NULL, NULL, NULL);
