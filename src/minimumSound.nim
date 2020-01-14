@@ -33,7 +33,7 @@ const
   )
 
 template checkWaveOutCall(call: typed): untyped =
-  when defined(release):
+  when defined(danger):
     discard call
   else:
     let r = call
@@ -73,5 +73,5 @@ proc WinMainCRTStartup() {.exportc.} =
       ExitProcess(0)
     Sleep(256);
 
-when not defined(release):
+when not defined(danger):
   WinMainCRTStartup()

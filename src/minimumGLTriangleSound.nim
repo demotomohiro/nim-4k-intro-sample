@@ -31,7 +31,7 @@ const
     dwVisibleMask:  0,
     dwDamageMask:   0) 
 
-when not defined(release):
+when not defined(danger):
   const
     attribList = [
       WGL_CONTEXT_MAJOR_VERSION_ARB,   4,
@@ -65,7 +65,7 @@ proc initScreen(): auto =
   discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
   discard wglMakeCurrent(hdc, wglCreateContext(hdc));
 
-  when not defined(release):
+  when not defined(danger):
     #Create Debug context
     type
       PFNwglCreateContextAttribsARB = proc (hDC: HDC, hShareContext: HGLRC, attribList: ptr int32): HGLRC {.stdcall.}
@@ -80,7 +80,7 @@ proc initScreen(): auto =
 
   loadExtensions()
 
-  when not defined(release):
+  when not defined(danger):
     echo "Using Debug Context"
     glEnableSttc(GL_DEBUG_OUTPUT_SYNCHRONOUS)
     var ids: GLuint = 0
@@ -98,7 +98,7 @@ proc createShader(source:cstring, shaderType: GLEnum): GLuint =
   assert result != 0
   glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
   glCompileShader(result)
-  when not defined(release):
+  when not defined(danger):
     var logLen: GLint
     glGetShaderiv(result, GL_INFO_LOG_LENGTH, addr logLen)
     if logLen != 0:
@@ -115,7 +115,7 @@ proc createShader(source:cstring, shaderType: GLEnum): GLuint =
 proc linkProgramObj(progObj: GLuint) =
   glLinkProgram(progObj)
 
-  when not defined(release):
+  when not defined(danger):
     var logLen: GLint
     glGetProgramiv(progObj, GL_INFO_LOG_LENGTH, addr logLen)
     if logLen != 0:
@@ -189,7 +189,7 @@ const soundCSSrc = (staticRead("../shaders/sound.cs") % [
                                               ]).cstring
 
 template checkWaveOutCall(call: typed): untyped =
-  when defined(release):
+  when defined(danger):
     discard call
   else:
     let r = call
@@ -257,5 +257,5 @@ proc WinMainCRTStartup() {.exportc.} =
   # Process keep alive if ExitProcess API was not called.
   ExitProcess(0)
 
-when not defined(release):
+when not defined(danger):
   WinMainCRTStartup()

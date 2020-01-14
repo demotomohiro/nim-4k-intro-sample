@@ -1,7 +1,7 @@
 --cc:vcc
 --d:noAutoGLerrorCheck
 --cpu:i386
-when defined(release):
+when defined(danger):
   --os:standalone
   --gc:none
   --dynlibOverrideAll

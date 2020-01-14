@@ -49,5 +49,5 @@ proc WinMainCRTStartup() {.exportc.} =
   # Process keep alive if ExitProcess API was not called.
   ExitProcess(0)
 
-when not defined(release):
+when not defined(danger):
   WinMainCRTStartup()

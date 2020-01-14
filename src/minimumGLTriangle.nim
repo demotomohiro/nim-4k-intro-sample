@@ -50,7 +50,7 @@ proc createShader(source:cstring, shaderType: GLEnum): GLuint =
   assert result != 0
   glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
   glCompileShader(result)
-  when not defined(release):
+  when not defined(danger):
     var logLen: GLint
     glGetShaderiv(result, GL_INFO_LOG_LENGTH, addr logLen)
     if logLen != 0:
@@ -67,7 +67,7 @@ proc createShader(source:cstring, shaderType: GLEnum): GLuint =
 proc linkProgramObj(progObj: GLuint) =
   glLinkProgram(progObj)
 
-  when not defined(release):
+  when not defined(danger):
     var logLen: GLint
     glGetProgramiv(progObj, GL_INFO_LOG_LENGTH, addr logLen)
     if logLen != 0:
@@ -112,5 +112,5 @@ proc WinMainCRTStartup() {.exportc.} =
   # Process keep alive if ExitProcess API was not called.
   ExitProcess(0)
 
-when not defined(release):
+when not defined(danger):
   WinMainCRTStartup()
