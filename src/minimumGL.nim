@@ -1,5 +1,4 @@
-import winlean4k
-include openGL4k
+import winlean4k, openGL4k2
 
 const
   ScreenWidth   = 640
@@ -44,7 +43,7 @@ proc initScreen() =
 
 proc WinMainCRTStartup() {.exportc.} =
   initScreen()
-  let version = glGetString4k(GL_VERSION)
+  let version = glGetString(GL_VERSION)
   discard MessageBoxA(nil, cast[cstring](version), cstring"minimumGL", 0)
   # Process keep alive if ExitProcess API was not called.
   ExitProcess(0)
