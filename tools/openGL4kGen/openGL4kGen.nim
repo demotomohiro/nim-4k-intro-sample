@@ -1,4 +1,4 @@
-import os, httpclient, strformat, xmlparser, xmltree
+import os, httpclient, strformat, strutils, xmlparser, xmltree
 import sets, with
 
 iterator elements(n: XmlNode): XmlNode =
@@ -138,14 +138,36 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                 if typeElem != nil:
                   if name in nimKeywords:
                     name = name & '0'
-                  stdout.write &" {name}: {typeElem[0].text};"
+                  let nptr = k.innerText.count('*')
+                  var typeText = typeElem[0].text
+                  if nptr == 1:
+                    if typeText == "GLchar":
+                      typeText = "cstring"
+                    else:
+                      typeText = "ptr " & typeText
+                  elif nptr == 2 and typeText == "GLchar":
+                    typeText = "cstringArray"
+                  stdout.write &" {name}: {typeText};"
             echo ")", ret, " {.", if isExt:  "oglExt" else: "ogl", ".}"
 
 proc outputCommon() =
   echo readFile("openGLTypes.nim")
-  echo "proc wglGetProcAddress(Arg1: cstring): pointer {.stdcall, importc, header: \"<wingdi.h>\".}"
+  echo "proc wglGetProcAddress(Arg1: cstring): pointer {.stdcall, importc, header: \"#include <Windows.h>\\n#include <wingdi.h>\".}"
   echo "{.pragma: ogl, stdcall, importc, header: \"<GL/gl.h>\"}"
   echo "{.pragma: oglExt, stdcall, importc, dynlib: wglGetProcAddress(\"0\").}"
+  echo """
+proc nimLoadProcs0() {.importc.}
+
+template loadExtensions*() =
+  ## call this after your rendering context has been setup if you use
+  ## extensions.
+  bind nimLoadProcs0
+  nimLoadProcs0()
+"""
+  echo "#wgl extensions are not much used in 4k intros."
+  echo "#Just hard code here."
+  echo "type WINBOOL* = int32"
+  echo "proc wglSwapIntervalEXT*(interval: cint): WINBOOL{.oglExt.}"
 
 proc main() =
   # https://github.com/KhronosGroup/OpenGL-Registry
