@@ -1,5 +1,4 @@
-import winlean4k
-include openGL4k
+import winlean4k, openGL4k2
 
 const
   ScreenWidth   = 640
@@ -103,8 +102,8 @@ proc WinMainCRTStartup() {.exportc.} =
 
   while true:
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
-    glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
-    glDrawArraysSttc(GL_TRIANGLES, 0, 3)
+    glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+    glDrawArrays(GL_TRIANGLES, 0, 3)
     discard SwapBuffers(hdc)
     if GetAsyncKeyState(VK_ESCAPE) != 0:
       ExitProcess(0)
