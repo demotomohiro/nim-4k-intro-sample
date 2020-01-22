@@ -1,5 +1,5 @@
 import winlean4k, openGL4k2
-include strutils_tmp
+import strutils
 
 const
   ScreenWidth  {.intdefine.} = 640
