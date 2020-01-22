@@ -1,5 +1,4 @@
-import winlean4k
-include openGL4k
+import winlean4k, openGL4k2
 include strutils_tmp
 
 const
@@ -245,11 +244,11 @@ proc WinMainCRTStartup() {.exportc.} =
 
   while true:
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
-    glClearSttc(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
     glUseProgram(triangleProgObj)
     let pos = getSoundPosition()
     glUniform1f(shaderTimeLoc, pos)
-    glDrawArraysSttc(GL_TRIANGLES, 0, 3)
+    glDrawArrays(GL_TRIANGLES, 0, 3)
     discard SwapBuffers(hdc)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
       ExitProcess(0)
