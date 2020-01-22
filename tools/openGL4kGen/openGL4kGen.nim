@@ -135,11 +135,21 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                   ret = ": " & typeElem[0].text
                 stdout.write &"proc {name}*("
               elif k.tag == "param":
-                if typeElem != nil:
-                  if name in nimKeywords:
-                    name = name & '0'
+                if name in nimKeywords:
+                  name = name & '0'
+                var typeText: string
+                if typeElem == nil:
+                  if k[0].kind == xnText:
+                    let nptr =  k[0].text.count('*')
+                    if nptr == 1:
+                      typeText = "pointer"
+                    elif nptr == 2:
+                      typeText = "ptr pointer"
+                  else:
+                    assert false
+                else:
+                  typeText = typeElem[0].text
                   let nptr = k.innerText.count('*')
-                  var typeText = typeElem[0].text
                   if nptr == 1:
                     if typeText == "GLchar":
                       typeText = "cstring"
@@ -147,7 +157,7 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                       typeText = "ptr " & typeText
                   elif nptr == 2 and typeText == "GLchar":
                     typeText = "cstringArray"
-                  stdout.write &" {name}: {typeText};"
+                stdout.write &" {name}: {typeText};"
             echo ")", ret, " {.", if isExt:  "oglExt" else: "ogl", ".}"
 
 proc outputCommon() =
