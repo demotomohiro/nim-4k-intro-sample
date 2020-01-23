@@ -123,6 +123,7 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
               var name = if nameElem == nil: "" else:
                                              nameElem[0].text
               let typeElem = k.child("ptype")
+              let nptr = k.innerText.count('*')
               if k.tag == "proto":
                 if name.len == 0:
                   break commandTag
@@ -132,7 +133,12 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                   break commandTag
                 assert name notin nimKeywords
                 if typeElem != nil:
-                  ret = ": " & typeElem[0].text
+                  ret = ": "
+                  if nptr == 1:
+                    ret &= "ptr "
+                  ret &= typeElem[0].text
+                elif k[0].kind == xnText and k[0].text == "void *":
+                  ret = ": pointer"
                 stdout.write &"proc {name}*("
               elif k.tag == "param":
                 if name in nimKeywords:
@@ -140,7 +146,6 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                 var typeText: string
                 if typeElem == nil:
                   if k[0].kind == xnText:
-                    let nptr =  k[0].text.count('*')
                     if nptr == 1:
                       typeText = "pointer"
                     elif nptr == 2:
@@ -149,7 +154,6 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
                     assert false
                 else:
                   typeText = typeElem[0].text
-                  let nptr = k.innerText.count('*')
                   if nptr == 1:
                     if typeText == "GLchar":
                       typeText = "cstring"
