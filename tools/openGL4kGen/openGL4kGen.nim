@@ -183,13 +183,16 @@ template loadExtensions*() =
   echo "type WINBOOL* = int32"
   echo "proc wglSwapIntervalEXT*(interval: cint): WINBOOL{.oglExt.}"
 
+proc downloadXml(url, filename: string): XmlNode =
+  if not existsFile(filename):
+    var client = newHttpClient()
+    client.downloadFile(url, filename)
+
+  return loadXml(filename)
+
 proc main() =
   # https://github.com/KhronosGroup/OpenGL-Registry
-  if not existsFile("gl.xml"):
-    var client = newHttpClient()
-    client.downloadFile("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
-
-  let node = loadXml("gl.xml")
+  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
 
   var ca: CoreAPI
   ca.loadCoreAPI(node)
