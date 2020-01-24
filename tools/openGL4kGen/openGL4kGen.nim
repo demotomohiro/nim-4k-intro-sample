@@ -7,10 +7,10 @@ iterator elements(n: XmlNode): XmlNode =
       yield i
 
 type
-  CoreAPI = object
-    coreCommands, coreCommandsExt, coreEnums: HashSet[string]
+  ExportAPI = object
+    exportCommands, exportCommandsExt, exportEnums: HashSet[string]
 
-proc loadCoreAPI(ca: var CoreAPI; node: XmlNode) =
+proc loadExportAPI(ca: var ExportAPI; node: XmlNode) =
   with ca:
     for i in elements(node):
       if i.tag == "feature" and i.attr("api") == "gl":
@@ -26,44 +26,44 @@ proc loadCoreAPI(ca: var CoreAPI; node: XmlNode) =
               if name.len == 0:
                 continue
               if k.tag == "enum":
-                coreEnums.incl name
+                exportEnums.incl name
               elif k.tag == "command":
                 if version == "1.0" or version == "1.1":
-                  coreCommands.incl name
+                  exportCommands.incl name
                 else:
-                  coreCommandsExt.incl name
+                  exportCommandsExt.incl name
           elif j.tag == "remove":
             for k in elements(j):
               let name = k.attr("name")
               if name.len == 0:
                 continue
               if k.tag == "enum":
-                assert name in coreEnums
-                coreEnums.excl name
+                assert name in exportEnums
+                exportEnums.excl name
               elif k.tag == "command":
-                assert name in coreCommands or name in coreCommandsExt
-                coreCommands.excl name
-                coreCommandsExt.excl name
+                assert name in exportCommands or name in exportCommandsExt
+                exportCommands.excl name
+                exportCommandsExt.excl name
 
-    assert "glNewList" notin coreCommands
-    assert "glDrawMeshTasksNV" notin coreCommands
-    assert "glCullFace" in coreCommands
-    assert "glCullFace" notin coreCommandsExt
-    assert "glEnable" in coreCommands
-    assert "glEnable" notin coreCommandsExt
-    assert "glDrawArrays" in coreCommands
-    assert "glDrawArrays" notin coreCommandsExt
-    assert "glSpecializeShader" notin coreCommands
-    assert "glSpecializeShader" in coreCommandsExt
-    assert "glGetnHistogram" notin coreCommands
-    assert "glGetnHistogram" notin coreCommandsExt
-    assert "glVertexP2ui" notin coreCommandsExt
-    assert "GL_CURRENT_BIT" notin coreEnums
-    assert "GL_LIGHTING_BIT" notin coreEnums
-    assert "GL_VERTEX_ATTRIB_ARRAY_DIVISOR" in coreEnums
-    assert "GL_SHADER_BINARY_FORMAT_SPIR_V" in coreEnums
+    assert "glNewList" notin exportCommands
+    assert "glDrawMeshTasksNV" notin exportCommands
+    assert "glCullFace" in exportCommands
+    assert "glCullFace" notin exportCommandsExt
+    assert "glEnable" in exportCommands
+    assert "glEnable" notin exportCommandsExt
+    assert "glDrawArrays" in exportCommands
+    assert "glDrawArrays" notin exportCommandsExt
+    assert "glSpecializeShader" notin exportCommands
+    assert "glSpecializeShader" in exportCommandsExt
+    assert "glGetnHistogram" notin exportCommands
+    assert "glGetnHistogram" notin exportCommandsExt
+    assert "glVertexP2ui" notin exportCommandsExt
+    assert "GL_CURRENT_BIT" notin exportEnums
+    assert "GL_LIGHTING_BIT" notin exportEnums
+    assert "GL_VERTEX_ATTRIB_ARRAY_DIVISOR" in exportEnums
+    assert "GL_SHADER_BINARY_FORMAT_SPIR_V" in exportEnums
 
-proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
+proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
   const
     needPrefixEnums = toHashSet(
       ["GL_BYTE", "GL_SHORT", "GL_INT", "GL_FLOAT", "GL_DOUBLE", "GL_FIXED"])
@@ -96,7 +96,7 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
       for j in elements(i):
         if j.tag == "enum":
           var name = j.attr("name")
-          if name.len == 0 or name notin ca.coreEnums:
+          if name.len == 0 or name notin ca.exportEnums:
             continue
           if name in needPrefixEnums:
             name = 'c' & name
@@ -127,9 +127,9 @@ proc outputCoreAPI(ca: var CoreAPI; node: XmlNode) =
               if k.tag == "proto":
                 if name.len == 0:
                   break commandTag
-                if name in ca.coreCommandsExt:
+                if name in ca.exportCommandsExt:
                   isExt = true
-                elif name notin ca.coreCommands:
+                elif name notin ca.exportCommands:
                   break commandTag
                 assert name notin nimKeywords
                 if typeElem != nil:
@@ -194,9 +194,9 @@ proc main() =
   # https://github.com/KhronosGroup/OpenGL-Registry
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
 
-  var ca: CoreAPI
-  ca.loadCoreAPI(node)
+  var ca: ExportAPI
+  ca.loadExportAPI(node)
   outputCommon()
-  ca.outputCoreAPI(node)
+  ca.outputExportAPI(node)
 
 main()
