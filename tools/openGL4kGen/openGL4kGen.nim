@@ -45,6 +45,8 @@ proc loadExportAPI(ca: var ExportAPI; node: XmlNode) =
                 exportCommands.excl name
                 exportCommandsExt.excl name
 
+proc testCoreOpenGL(ea: var ExportAPI) =
+  with ea:
     assert "glNewList" notin exportCommands
     assert "glDrawMeshTasksNV" notin exportCommands
     assert "glCullFace" in exportCommands
@@ -196,6 +198,7 @@ proc main() =
 
   var ca: ExportAPI
   ca.loadExportAPI(node)
+  ca.testCoreOpenGL()
   outputCommon()
   ca.outputExportAPI(node)
 
