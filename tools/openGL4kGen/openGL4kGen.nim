@@ -168,22 +168,7 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
 
 proc outputCommon() =
   echo readFile("openGLTypes.nim")
-  echo "proc wglGetProcAddress(Arg1: cstring): pointer {.stdcall, importc, header: \"#include <Windows.h>\\n#include <wingdi.h>\".}"
-  echo "{.pragma: ogl, stdcall, importc, header: \"<GL/gl.h>\"}"
-  echo "{.pragma: oglExt, stdcall, importc, dynlib: wglGetProcAddress(\"0\").}"
-  echo """
-proc nimLoadProcs0() {.importc.}
-
-template loadExtensions*() =
-  ## call this after your rendering context has been setup if you use
-  ## extensions.
-  bind nimLoadProcs0
-  nimLoadProcs0()
-"""
-  echo "#wgl extensions are not much used in 4k intros."
-  echo "#Just hard code here."
-  echo "type WINBOOL* = int32"
-  echo "proc wglSwapIntervalEXT*(interval: cint): WINBOOL{.oglExt.}"
+  echo readFile("openGLCommon.nim")
 
 proc downloadXml(url, filename: string): XmlNode =
   if not existsFile(filename):
