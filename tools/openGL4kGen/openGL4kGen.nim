@@ -177,6 +177,9 @@ proc downloadXml(url, filename: string): XmlNode =
 
   return loadXml(filename)
 
+proc wgl() =
+  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/wgl.xml", "wgl.xml")
+
 proc main() =
   # https://github.com/KhronosGroup/OpenGL-Registry
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
@@ -186,5 +189,7 @@ proc main() =
   ca.testCoreOpenGL()
   outputCommon()
   ca.outputExportAPI(node)
+
+  wgl()
 
 main()
