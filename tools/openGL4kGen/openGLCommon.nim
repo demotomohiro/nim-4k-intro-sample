@@ -1,4 +1,4 @@
-proc wglGetProcAddress(Arg1: cstring): pointer {.stdcall, importc, header: "#include <Windows.h>\\n#include <wingdi.h>".}
+import winlean4k
 
 {.pragma: ogl, stdcall, importc, header: "<GL/gl.h>"}
 {.pragma: oglExt, stdcall, importc, dynlib: wglGetProcAddress("0").}

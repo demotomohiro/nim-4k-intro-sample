@@ -10,7 +10,7 @@ type
   ExportAPI = object
     exportCommands, exportCommandsExt, exportEnums: HashSet[string]
 
-proc loadExportAPI(ca: var ExportAPI; node: XmlNode) =
+proc loadExportAPI(ca: var ExportAPI; node: XmlNode; extensions = HashSet[string]()) =
   with ca:
     for i in elements(node):
       if i.tag == "feature" and i.attr("api") == "gl":
@@ -44,6 +44,22 @@ proc loadExportAPI(ca: var ExportAPI; node: XmlNode) =
                 assert name in exportCommands or name in exportCommandsExt
                 exportCommands.excl name
                 exportCommandsExt.excl name
+      elif i.tag == "extensions":
+        for j in elements(i):
+          let name = j.attr("name")
+          if j.tag == "extension" and name.len != 0 and name in extensions:
+            for k in elements(j):
+              let profile = k.attr("profile")
+              if k.tag != "require" or profile == "compatibility":
+                continue
+              for l in elements(k):
+                let name = l.attr("name")
+                if name.len == 0:
+                  continue
+                if l.tag == "enum":
+                  exportEnums.incl name
+                elif l.tag == "command":
+                  exportCommandsExt.incl name
 
 proc testCoreOpenGL(ea: var ExportAPI) =
   with ea:
@@ -179,6 +195,10 @@ proc downloadXml(url, filename: string): XmlNode =
 
 proc wgl() =
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/wgl.xml", "wgl.xml")
+
+  var ea: ExportAPI
+  ea.loadExportAPI(node, ["WGL_ARB_create_context", "WGL_ARB_create_context_profile"].toHashSet)
+  ea.outputExportAPI(node)
 
 proc main() =
   # https://github.com/KhronosGroup/OpenGL-Registry
