@@ -110,7 +110,7 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
   echo "const"
   for i in elements(node):
     if i.tag == "enums":
-      var enumType = if i.attr("type") == "bitmask": ".GLbitfield" else: ".GLenum"
+      var defaultEnumType = if i.attr("type") == "bitmask": ".GLbitfield" else: ".GLenum"
       for j in elements(i):
         if j.tag == "enum":
           var name = j.attr("name")
@@ -122,8 +122,11 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
           let value = j.attr("value")
           if value.len == 0:
             continue
+          var enumType = defaultEnumType
           if j.attr("type") == "ull":
             enumType = "'u64.GLuint64"
+          if name == "GL_TRUE" or name == "GL_FALsE":
+            enumType = ".GLboolean"
           echo &"  {name}* = {value}{enumType}"
 
   echo ""
