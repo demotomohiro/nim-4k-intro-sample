@@ -33,10 +33,10 @@ const
 when not defined(danger):
   const
     attribList = [
-      WGL_CONTEXT_MAJOR_VERSION_ARB,   4,
-      WGL_CONTEXT_MINOR_VERSION_ARB,   5,
-      WGL_CONTEXT_FLAGS_ARB,           WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB or WGL_CONTEXT_DEBUG_BIT_ARB,
-      WGL_CONTEXT_PROFILE_MASK_ARB,    WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+      WGL_CONTEXT_MAJOR_VERSION_ARB.cint,   4,
+      WGL_CONTEXT_MINOR_VERSION_ARB.cint,   5,
+      WGL_CONTEXT_FLAGS_ARB.cint,           cint(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB or WGL_CONTEXT_DEBUG_BIT_ARB),
+      WGL_CONTEXT_PROFILE_MASK_ARB.cint,    WGL_CONTEXT_CORE_PROFILE_BIT_ARB.cint,
       0]
 
   proc debugGLCallback(
@@ -67,7 +67,7 @@ proc initScreen(): auto =
   when not defined(danger):
     #Create Debug context
     type
-      PFNwglCreateContextAttribsARB = proc (hDC: HDC, hShareContext: HGLRC, attribList: ptr int32): HGLRC {.stdcall.}
+      PFNwglCreateContextAttribsARB = proc (hDC: HDC, hShareContext: HGLRC, attribList: ptr cint): HGLRC {.stdcall.}
     let wglCreateContextAttribsARB = cast[PFNwglCreateContextAttribsARB](wglGetProcAddress("wglCreateContextAttribsARB"))
 
     if wglCreateContextAttribsARB == nil:
@@ -81,7 +81,7 @@ proc initScreen(): auto =
 
   when not defined(danger):
     echo "Using Debug Context"
-    glEnableSttc(GL_DEBUG_OUTPUT_SYNCHRONOUS)
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS)
     var ids: GLuint = 0
     glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, addr ids, GL_TRUE);
     glDebugMessageCallback(debugGLCallback, nil)
