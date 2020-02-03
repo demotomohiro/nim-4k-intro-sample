@@ -62,7 +62,7 @@ proc initScreen(): auto =
   var varPfd = pfd
 
   discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
-  discard wglMakeCurrent(hdc, wglCreateContext(hdc));
+  discard wglMakeCurrent(hdc, wglCreateContext(hdc))
 
   when not defined(danger):
     #Create Debug context
@@ -83,7 +83,7 @@ proc initScreen(): auto =
     echo "Using Debug Context"
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS)
     var ids: GLuint = 0
-    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, addr ids, GL_TRUE);
+    glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, addr ids, GL_TRUE)
     glDebugMessageCallback(debugGLCallback, nil)
     #Draw call without Vertex array object being bound is error when using core opengl context.
     var vao: GLuint
@@ -238,7 +238,7 @@ proc WinMainCRTStartup() {.exportc.} =
   initScene()
   initSound()
 
-  discard wglSwapIntervalEXT(1);
+  discard wglSwapIntervalEXT(1)
 
   var msg: MSG
 

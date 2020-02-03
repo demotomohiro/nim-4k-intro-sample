@@ -39,7 +39,7 @@ proc initScreen() =
   var varPfd = pfd
 
   discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
-  discard wglMakeCurrent(hdc, wglCreateContext(hdc));
+  discard wglMakeCurrent(hdc, wglCreateContext(hdc))
 
 proc WinMainCRTStartup() {.exportc.} =
   initScreen()

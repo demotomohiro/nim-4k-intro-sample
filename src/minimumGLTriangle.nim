@@ -39,7 +39,7 @@ proc initScreen(): auto =
   var varPfd = pfd
 
   discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
-  discard wglMakeCurrent(hdc, wglCreateContext(hdc));
+  discard wglMakeCurrent(hdc, wglCreateContext(hdc))
   loadExtensions()
 
   return hdc
@@ -96,7 +96,7 @@ proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
   initScene()
 
-  discard wglSwapIntervalEXT(1);
+  discard wglSwapIntervalEXT(1)
 
   var msg: MSG
 
