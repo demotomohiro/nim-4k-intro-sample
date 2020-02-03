@@ -10,8 +10,3 @@ template loadExtensions*() =
   ## extensions.
   bind nimLoadProcs0
   nimLoadProcs0()
-
-#wgl extensions are not much used in 4k intros.
-#Just hard code here.
-type WINBOOL* = int32
-proc wglSwapIntervalEXT*(interval: cint): WINBOOL{.oglExt.}

@@ -157,7 +157,11 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
                   ret = ": "
                   if nptr == 1:
                     ret &= "ptr "
-                  ret &= typeElem[0].text
+                  let typeText = typeElem[0].text
+                  if typeText == "BOOL":
+                    ret &= "WINBOOL"
+                  else:
+                    ret &= typeText
                 elif k[0].kind == xnText and k[0].text == "void *":
                   ret = ": pointer"
                 stdout.write &"proc {name}*("
@@ -171,6 +175,8 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
                       typeText = "pointer"
                     elif nptr == 2:
                       typeText = "ptr pointer"
+                    else:
+                      typeText = k[0].text
                   else:
                     assert false
                 else:
@@ -199,8 +205,10 @@ proc downloadXml(url, filename: string): XmlNode =
 proc wgl() =
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/wgl.xml", "wgl.xml")
 
+  # Commonly used WGL extensions.
+  const wglExts = ["WGL_ARB_create_context", "WGL_ARB_create_context_profile", "WGL_EXT_swap_control"].toHashSet
   var ea: ExportAPI
-  ea.loadExportAPI(node, ["WGL_ARB_create_context", "WGL_ARB_create_context_profile"].toHashSet)
+  ea.loadExportAPI(node, wglExts)
   ea.outputExportAPI(node)
 
 proc main() =
