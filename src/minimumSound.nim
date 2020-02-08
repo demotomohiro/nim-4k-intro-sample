@@ -59,10 +59,21 @@ proc WinMainCRTStartup() {.exportc.} =
 
   var h_wave_out: HWAVEOUT
   var wf = wave_format
-  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD_PTR](hWnd), 0.DWORD_PTR, CALLBACK_WINDOW.DWORD))
+  checkWaveOutCall(
+                   waveOutOpen(
+                               addr h_wave_out,
+                               WAVE_MAPPER,
+                               addr wf,
+                               cast[DWORD_PTR](hWnd),
+                               0.DWORD_PTR,
+                               CALLBACK_WINDOW.DWORD))
   var wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
-  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
+  checkWaveOutCall(
+                   waveOutPrepareHeader(
+                                        h_wave_out,
+                                        addr wh,
+                                        sizeof(wave_hdr).UINT))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
 
   var msg: MSG
@@ -71,7 +82,7 @@ proc WinMainCRTStartup() {.exportc.} =
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
     if GetAsyncKeyState(VK_ESCAPE) != 0 or msg.message == MM_WOM_DONE:
       ExitProcess(0)
-    Sleep(256);
+    Sleep(256)
 
 when not defined(danger):
   WinMainCRTStartup()
