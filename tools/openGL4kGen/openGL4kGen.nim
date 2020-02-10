@@ -1,5 +1,6 @@
 import os, httpclient, strformat, strutils, xmlparser, xmltree
 import sets, with
+import ../../compiler/wordrecg
 
 iterator elements(n: XmlNode): XmlNode =
   for i in items(n):
@@ -85,27 +86,9 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
   const
     needPrefixEnums = toHashSet(
       ["GL_BYTE", "GL_SHORT", "GL_INT", "GL_FLOAT", "GL_DOUBLE", "GL_FIXED"])
+    #Get Nim keywords using compiler/wordrecg
     nimKeywords = toHashSet(
-      ["addr", "and", "as", "asm",
-       "bind", "block", "break",
-       "case", "cast", "concept", "const", "continue", "converter",
-       "defer", "discard", "distinct", "div", "do",
-       "elif", "else", "end", "enum", "except", "export",
-       "finally", "for", "from", "func",
-       "if", "import", "in", "include", "interface", "is", "isnot", "iterator",
-       "let",
-       "macro", "method", "mixin", "mod",
-       "nil", "not", "notin",
-       "object", "of", "or", "out",
-       "proc", "ptr",
-       "raise", "ref", "return",
-       "shl", "shr", "static",
-       "template", "try", "tuple", "type",
-       "using",
-       "var",
-       "when", "while",
-       "xor",
-       "yield"])
+      specialWords[TSpecialWord.low.succ..nimKeywordsHigh.TSpecialWord])
 
   echo "const"
   for i in elements(node):
