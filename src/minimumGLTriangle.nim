@@ -42,6 +42,8 @@ proc initScreen(): auto =
   discard wglMakeCurrent(hdc, wglCreateContext(hdc))
   loadExtensions()
 
+  ShowCursor(0)
+
   return hdc
 
 proc createShader(source:cstring, shaderType: GLEnum): GLuint =

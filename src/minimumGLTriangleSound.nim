@@ -79,6 +79,8 @@ proc initScreen(): auto =
 
   loadExtensions()
 
+  ShowCursor(0)
+
   when not defined(danger):
     echo "Using Debug Context"
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS)
