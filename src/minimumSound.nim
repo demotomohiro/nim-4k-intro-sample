@@ -76,7 +76,7 @@ proc WinMainCRTStartup() {.exportc.} =
                                         sizeof(wave_hdr).UINT))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
 
-  var msg: MSG
+  var msg {.noinit.}: MSG
 
   while true:
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
