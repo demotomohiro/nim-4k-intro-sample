@@ -242,7 +242,7 @@ proc WinMainCRTStartup() {.exportc.} =
 
   discard wglSwapIntervalEXT(1)
 
-  var msg: MSG
+  var msg {.noinit.}: MSG
 
   while true:
     discard PeekMessageA(addr msg, nil, 0, 0, PM_REMOVE)
