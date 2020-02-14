@@ -67,6 +67,8 @@ __forceinline HDC initScreen() {
 
   loadExtensions();
 
+  ShowCursor(FALSE);
+
   return hdc;
 }
 

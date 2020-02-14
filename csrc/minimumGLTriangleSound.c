@@ -85,6 +85,8 @@ HDC initScreen() {
 
   loadExtensions();
 
+  ShowCursor(FALSE);
+
   return hdc;
 }
 
