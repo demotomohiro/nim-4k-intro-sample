@@ -4,6 +4,8 @@ import strutils
 const
   ScreenWidth  {.intdefine.} = 640
   ScreenHeight {.intdefine.} = 480
+
+let
   pfd           = PIXELFORMATDESCRIPTOR(
     nSize:          sizeof(PIXELFORMATDESCRIPTOR).uint16,
     nVersion:       1'u16,
@@ -59,9 +61,7 @@ proc initScreen(): auto =
     ScreenWidth, ScreenHeight, nil, nil, nil, nil)
   let hdc = GetDC(hWnd)
 
-  var varPfd = pfd
-
-  discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
+  discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, unsafeAddr pfd), unsafeAddr pfd)
   discard wglMakeCurrent(hdc, wglCreateContext(hdc))
 
   when not defined(danger):
@@ -155,7 +155,9 @@ const
   soundLengthInSecond = 60
   soundNumChannels    = 2
   soundNumSamples     = soundSampleRate * soundLengthInSecond
-  wave_format = WAVEFORMATEX(
+
+let
+  waveFormat = WAVEFORMATEX(
     wFormatTag:       WAVE_FORMAT_IEEE_FLOAT,
     nChannels:        soundNumChannels,
     nSamplesPerSec:   soundSampleRate,
@@ -221,8 +223,7 @@ proc initSound() =
   glMemoryBarrier(GL_BUFFER_UPDATE_BARRIER_BIT)
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
 
-  var wf = wave_format
-  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, addr wf, cast[DWORD_PTR](hWnd), 0.DWORD_PTR, CALLBACK_WINDOW.DWORD))
+  checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, unsafeAddr waveFormat, cast[DWORD_PTR](hWnd), 0.DWORD_PTR, CALLBACK_WINDOW.DWORD))
   wh = wave_hdr
   wh.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
