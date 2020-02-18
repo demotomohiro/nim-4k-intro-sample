@@ -3,6 +3,8 @@ import winlean4k, openGL4k2
 const
   ScreenWidth   = 640
   ScreenHeight  = 480
+
+let
   pfd           = PIXELFORMATDESCRIPTOR(
     nSize:          sizeof(PIXELFORMATDESCRIPTOR).uint16,
     nVersion:       1'u16,
@@ -36,9 +38,7 @@ proc initScreen(): auto =
     ScreenWidth, ScreenHeight, nil, nil, nil, nil)
   let hdc = GetDC(hWnd)
 
-  var varPfd = pfd
-
-  discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, addr varPfd), addr varPfd)
+  discard SetPixelFormat(hdc, ChoosePixelFormat(hdc, unsafeAddr pfd), unsafeAddr pfd)
   discard wglMakeCurrent(hdc, wglCreateContext(hdc))
   loadExtensions()
 
