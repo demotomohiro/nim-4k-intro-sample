@@ -169,8 +169,9 @@ let
 
 var samples: array[soundNumSamples * soundNumChannels, SampleType]
 
-const
-  wave_hdr = WAVEHDR(
+#waveHdr can be modified by waveOutWrite when the buffer is finished.
+var
+  waveHdr = WAVEHDR(
     lpData:           nil,
     dwBufferLength:   sizeof(samples).uint32,
     dwBytesRecorded:  0,
@@ -180,9 +181,6 @@ const
     lpNext:           nil,
     reserved:         0
   )
-
-#wh can be modified by waveOutWrite when the buffer is finished.
-var wh: WAVEHDR
 
 const soundCSLocalSize = 32
 const soundCSSrc = (staticRead("../shaders/sound.cs") % [
@@ -224,10 +222,9 @@ proc initSound() =
   glGetNamedBufferSubData(ssbo, 0, sizeof(samples), addr samples[0])
 
   checkWaveOutCall(waveOutOpen(addr h_wave_out, WAVE_MAPPER, unsafeAddr waveFormat, cast[DWORD_PTR](hWnd), 0.DWORD_PTR, CALLBACK_WINDOW.DWORD))
-  wh = wave_hdr
-  wh.lpData = cast[cstring](addr samples[0])
-  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
-  checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
+  waveHdr.lpData = cast[cstring](addr samples[0])
+  checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr waveHdr, sizeof(waveHdr).UINT))
+  checkWaveOutCall(waveOutWrite(h_wave_out, addr waveHdr, sizeof(waveHdr).UINT))
 
 proc getSoundPosition(): float32 =
   var mmtime: MMTIME
