@@ -8,7 +8,9 @@ const
   soundLengthInSecond = 60
   soundNumChannels    = 2
   soundNumSamples     = soundSampleRate * soundLengthInSecond
-  wave_format = WAVEFORMATEX(
+
+let
+  waveFormat = WAVEFORMATEX(
     wFormatTag:       WAVE_FORMAT_IEEE_FLOAT,
     nChannels:        soundNumChannels,
     nSamplesPerSec:   soundSampleRate,
@@ -20,8 +22,8 @@ const
 
 var samples: array[soundNumSamples * soundNumChannels, SampleType]
 
-const
-  wave_hdr = WAVEHDR(
+var
+  waveHdr = WAVEHDR(
     lpData:           nil,
     dwBufferLength:   sizeof(samples).uint32,
     dwBytesRecorded:  0,
@@ -58,23 +60,22 @@ proc WinMainCRTStartup() {.exportc.} =
     samples[i * 2 + 1] = v
 
   var h_wave_out: HWAVEOUT
-  var wf = wave_format
   checkWaveOutCall(
                    waveOutOpen(
                                addr h_wave_out,
                                WAVE_MAPPER,
-                               addr wf,
+                               unsafeAddr waveFormat,
                                cast[DWORD_PTR](hWnd),
                                0.DWORD_PTR,
                                CALLBACK_WINDOW.DWORD))
-  var wh = wave_hdr
-  wh.lpData = cast[cstring](addr samples[0])
+
+  wave_hdr.lpData = cast[cstring](addr samples[0])
   checkWaveOutCall(
                    waveOutPrepareHeader(
                                         h_wave_out,
-                                        addr wh,
-                                        sizeof(wave_hdr).UINT))
-  checkWaveOutCall(waveOutWrite(h_wave_out, addr wh, sizeof(wave_hdr).UINT))
+                                        addr waveHdr,
+                                        sizeof(waveHdr).UINT))
+  checkWaveOutCall(waveOutWrite(h_wave_out, addr waveHdr, sizeof(waveHdr).UINT))
 
   var msg {.noinit.}: MSG
 
