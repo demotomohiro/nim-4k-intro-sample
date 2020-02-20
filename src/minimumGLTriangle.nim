@@ -31,7 +31,7 @@ let
     dwVisibleMask:  0,
     dwDamageMask:   0)
 
-proc initScreen(): auto =
+proc initScreen(): auto {.inline.} =
   let hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
@@ -46,7 +46,7 @@ proc initScreen(): auto =
 
   return hdc
 
-proc createShader(source:cstring, shaderType: GLEnum): GLuint =
+proc createShader(source:cstring, shaderType: GLEnum): GLuint {.inline.}=
   result = glCreateShader(shaderType)
   assert result != 0
   glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
@@ -85,7 +85,7 @@ proc linkProgramObj(progObj: GLuint) =
 const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
 const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
-proc initScene() =
+proc initScene() {.inline.} =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
   let fso = createShader(triangleFSSrc, GL_FRAGMENT_SHADER)
   let progObj = glCreateProgram()
