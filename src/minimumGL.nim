@@ -31,7 +31,7 @@ let
     dwVisibleMask:  0,
     dwDamageMask:   0)
 
-proc initScreen() =
+proc initScreen() {.inline.} =
   let hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
