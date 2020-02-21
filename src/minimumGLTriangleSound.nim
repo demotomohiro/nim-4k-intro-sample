@@ -54,7 +54,7 @@ when not defined(danger):
     assert severity != GL_DEBUG_SEVERITY_HIGH
 
 var hWnd: HWND
-proc initScreen(): auto =
+proc initScreen(): auto {.inline.} =
   hWnd = CreateWindowA(
     "STATIC".cstring, nil,
     WS_POPUP or WS_VISIBLE, 0, 0,
@@ -94,7 +94,7 @@ proc initScreen(): auto =
 
   return hdc
 
-proc createShader(source:cstring, shaderType: GLEnum): GLuint =
+proc createShader(source:cstring, shaderType: GLEnum): GLuint {.inline.} =
   result = glCreateShader(shaderType)
   assert result != 0
   glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
@@ -138,7 +138,7 @@ const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 var triangleProgObj: GLuint
 
-proc initScene() =
+proc initScene() {.inline.} =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
   let fso = createShader(triangleFSSrc, GL_FRAGMENT_SHADER)
   let progObj = glCreateProgram()
@@ -226,7 +226,7 @@ proc initSound() =
   checkWaveOutCall(waveOutPrepareHeader(h_wave_out, addr waveHdr, sizeof(waveHdr).UINT))
   checkWaveOutCall(waveOutWrite(h_wave_out, addr waveHdr, sizeof(waveHdr).UINT))
 
-proc getSoundPosition(): float32 =
+proc getSoundPosition(): float32 {.inline.} =
   var mmtime: MMTIME
   mmtime.wType = TIME_SAMPLES
 
