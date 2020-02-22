@@ -30,7 +30,7 @@ PFNGLMEMORYBARRIERPROC glMemoryBarrier;
 PFNGLGETNAMEDBUFFERSUBDATAPROC glGetNamedBufferSubData;
 PFNGLUNIFORM1FPROC glUniform1f;
 
-void loadExtensions() {
+__forceinline void loadExtensions() {
   glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
   glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
   glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
@@ -73,7 +73,7 @@ static PIXELFORMATDESCRIPTOR pfd =
 
 HWND hWnd;
 
-HDC initScreen() {
+__forceinline HDC initScreen() {
 	hWnd =	CreateWindowA("STATIC", 0,
 		WS_POPUP|WS_VISIBLE, 0, 0,
 		WIDTH, HEIGHT, NULL, NULL, NULL, NULL);
@@ -90,7 +90,7 @@ HDC initScreen() {
   return hdc;
 }
 
-GLuint createShader(const char* source, GLenum shaderType) {
+__forceinline GLuint createShader(const char* source, GLenum shaderType) {
   GLenum result = glCreateShader(shaderType);
   glShaderSource(result, 1, (const GLchar**)&source, NULL);
   glCompileShader(result);
@@ -109,7 +109,7 @@ void linkProgramObj(GLuint progObj) {
 
 GLuint triangleProgObj;
 
-void initScene() {
+__forceinline void initScene() {
   GLuint vso = createShader(triangleAnim_vs, GL_VERTEX_SHADER);
   GLuint fso = createShader(triangle_fs, GL_FRAGMENT_SHADER);
   GLuint progObj = glCreateProgram();
@@ -159,7 +159,7 @@ WAVEHDR wave_hdr =
 
 HWAVEOUT h_wave_out;
 
-void initSound() {
+__forceinline void initSound() {
   GLuint cso = createShader(sound_cs, GL_COMPUTE_SHADER);
   GLuint progObj = glCreateProgram();
   glAttachShader(progObj, cso);
@@ -182,7 +182,7 @@ void initSound() {
 	waveOutWrite(h_wave_out, &wave_hdr, sizeof(wave_hdr));
 }
 
-float getSoundPosition() {
+__forceinline float getSoundPosition() {
 	MMRESULT r;
 
 	MMTIME mmtime =
