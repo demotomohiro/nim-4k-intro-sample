@@ -1,6 +1,8 @@
 import winlean4k, openGL4k2
 import strutils
 
+{.pragma: forceInline, codegenDecl: "__forceinline  $# $#$#".}
+
 const
   ScreenWidth  {.intdefine.} = 640
   ScreenHeight {.intdefine.} = 480
@@ -94,7 +96,7 @@ proc initScreen(): auto {.inline.} =
 
   return hdc
 
-proc createShader(source:cstring, shaderType: GLEnum): GLuint {.inline.} =
+proc createShader(source:cstring, shaderType: GLEnum): GLuint {.forceInline.} =
   result = glCreateShader(shaderType)
   assert result != 0
   glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
@@ -138,7 +140,7 @@ const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 var triangleProgObj: GLuint
 
-proc initScene() {.inline.} =
+proc initScene() {.forceInline.} =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
   let fso = createShader(triangleFSSrc, GL_FRAGMENT_SHADER)
   let progObj = glCreateProgram()
@@ -203,7 +205,7 @@ template checkWaveOutCall(call: typed): untyped =
 
 var h_wave_out: HWAVEOUT
 
-proc initSound() =
+proc initSound() {.forceInline.} =
   let cso = createShader(soundCSSrc, GL_COMPUTE_SHADER)
   let progObj = glCreateProgram()
   glAttachShader(progObj, cso)
