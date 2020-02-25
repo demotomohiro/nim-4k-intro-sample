@@ -1,5 +1,7 @@
 import winlean4k, openGL4k2
 
+{.pragma: forceInline, codegenDecl: "__forceinline  $# $#$#".}
+
 const
   ScreenWidth   = 640
   ScreenHeight  = 480
@@ -85,7 +87,7 @@ proc linkProgramObj(progObj: GLuint) =
 const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
 const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
-proc initScene() {.inline.} =
+proc initScene() {.forceInline.} =
   let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
   let fso = createShader(triangleFSSrc, GL_FRAGMENT_SHADER)
   let progObj = glCreateProgram()
