@@ -14,3 +14,8 @@ when defined(danger):
   put "vcc.options.always", "/nologo /Ob2 /Oi /Os /GS-"
   put "vcc.options.linker", "/SUBSYSTEM:WINDOWS"
   put "vcc.linkTmpl", "$options /OUT:$exefile.exe $objfiles"
+
+if not existsFile("openGL4k2.nim"):
+  withDir "../tools/openGL4kGen":
+    selfExec("c -d:ssl openGL4kGen.nim")
+    exec("openGL4kGen.exe -o=../../src/openGL4k2.nim")
