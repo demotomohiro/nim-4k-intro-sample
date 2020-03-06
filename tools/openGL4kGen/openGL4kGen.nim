@@ -1,5 +1,5 @@
 import os, httpclient, strformat, strutils, xmlparser, xmltree
-import sets, with
+import parseopt, sets, with
 import ../../compiler/wordrecg
 
 iterator elements(n: XmlNode): XmlNode =
@@ -82,7 +82,7 @@ proc testCoreOpenGL(ea: var ExportAPI) =
     assert "GL_VERTEX_ATTRIB_ARRAY_DIVISOR" in exportEnums
     assert "GL_SHADER_BINARY_FORMAT_SPIR_V" in exportEnums
 
-proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
+proc outputExportAPI(ca: var ExportAPI; fout: File; node: XmlNode) =
   const
     needPrefixEnums = toHashSet(
       ["GL_BYTE", "GL_SHORT", "GL_INT", "GL_FLOAT", "GL_DOUBLE", "GL_FIXED"])
@@ -90,7 +90,7 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
     nimKeywords = toHashSet(
       specialWords[TSpecialWord.low.succ..nimKeywordsHigh.TSpecialWord])
 
-  echo "const"
+  fout.write "const\n"
   for i in elements(node):
     if i.tag == "enums":
       var defaultEnumType = if i.attr("type") == "bitmask": ".GLbitfield" else: ".GLenum"
@@ -110,9 +110,9 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
             enumType = "'u64.GLuint64"
           if name == "GL_TRUE" or name == "GL_FALsE":
             enumType = ".GLboolean"
-          echo &"  {name}* = {value}{enumType}"
+          fout.write &"  {name}* = {value}{enumType}\n"
 
-  echo ""
+  fout.write "\n"
 
   for i in elements(node):
     if i.tag == "commands":
@@ -147,7 +147,7 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
                     ret &= typeText
                 elif k[0].kind == xnText and k[0].text == "void *":
                   ret = ": pointer"
-                stdout.write &"proc {name}*("
+                fout.write &"proc {name}*("
               elif k.tag == "param":
                 if name in nimKeywords:
                   name = name & '0'
@@ -171,12 +171,14 @@ proc outputExportAPI(ca: var ExportAPI; node: XmlNode) =
                       typeText = "ptr " & typeText
                   elif nptr == 2 and typeText == "GLchar":
                     typeText = "cstringArray"
-                stdout.write &" {name}: {typeText};"
-            echo ")", ret, " {.", if isExt:  "oglExt" else: "ogl", ".}"
+                fout.write &" {name}: {typeText};"
+            fout.write ")", ret, " {.", if isExt:  "oglExt" else: "ogl", ".}\n"
 
-proc outputCommon() =
-  echo readFile("openGLTypes.nim")
-  echo readFile("openGLCommon.nim")
+proc outputCommon(fout: File) =
+  fout.write readFile("openGLTypes.nim")
+  fout.write '\n'
+  fout.write readFile("openGLCommon.nim")
+  fout.write '\n'
 
 proc downloadXml(url, filename: string): XmlNode =
   if not existsFile(filename):
@@ -185,25 +187,38 @@ proc downloadXml(url, filename: string): XmlNode =
 
   return loadXml(filename)
 
-proc wgl() =
+proc wgl(fout: File) =
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/wgl.xml", "wgl.xml")
 
   # Commonly used WGL extensions.
   const wglExts = ["WGL_ARB_create_context", "WGL_ARB_create_context_profile", "WGL_EXT_swap_control"].toHashSet
   var ea: ExportAPI
   ea.loadExportAPI(node, wglExts)
-  ea.outputExportAPI(node)
+  ea.outputExportAPI(fout, node)
 
 proc main() =
+  var fout = stdout
+
+  for kind, key, val in getopt():
+    case kind
+    of cmdArgument: discard
+    of cmdLongOption, cmdShortOption:
+      case key
+      of "o": fout = open(val, fmWrite)
+      else: quit("Unknown option: " & key)
+    of cmdEnd: assert(false) # cannot happen
+
   # https://github.com/KhronosGroup/OpenGL-Registry
   let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
 
   var ca: ExportAPI
   ca.loadExportAPI(node)
   ca.testCoreOpenGL()
-  outputCommon()
-  ca.outputExportAPI(node)
+  outputCommon(fout)
+  ca.outputExportAPI(fout, node)
 
-  wgl()
+  wgl(fout)
+
+  fout.close
 
 main()
