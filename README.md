@@ -11,6 +11,11 @@ Nim use C compiler in Visual Studio as backend.
 Crinkler works as linker and compress your code and data.
 Output executable file from crinkler decompress code at runtime.
 
+## Required libraries
+- [winlean4k](https://github.com/demotomohiro/winlean4k)
+- [with](https://github.com/zevv/with)
+  - Used in openGL4kGen
+
 ## How to build
 Make sure parent directories of `nim` and `crinker` in `PATH` environment variable and you can run them from command prompt.
 1. Set `LIB` environment variable to the directory containing `*.lib` files to use Windows API.
@@ -34,6 +39,16 @@ Make sure parent directories of `nim` and `crinker` in `PATH` environment variab
    ```console
    nim c minimum.nim
    ```
+
+## Directory structure
+- csrc
+  - C language code same to source code in `src` directory so that you can see whether Nim code can be compiled as small as C
+- shaders
+  - GLSL shader langage code used by samples that use shader
+- src
+  - Nim language sample code
+- tools
+  - Tools used for making 4k intros with Nim
 
 ## openGL4kGen
 It download and read the OpenGL Registry XML file and generate a OpenGL wrapper optimized for 4k-intro.
