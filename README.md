@@ -15,9 +15,13 @@ Output executable file from crinkler decompress code at runtime.
 - [winlean4k](https://github.com/demotomohiro/winlean4k)
 - [with](https://github.com/zevv/with)
   - Used in openGL4kGen
+- [OpenGL Extension Header Files](https://www.khronos.org/registry/OpenGL/index_gl.php)
+  - Optional. This header file is used when building samples in `csrc` directory that uses OpenGL.
+  - Create the directory `GL` in somewhere and download `glext.h` and `wglext.h` to it.
+  - Create the directory `KHR` in same place and download `khrplatform.h` to it.
 
-## How to build
-Make sure parent directories of `nim` and `crinker` in `PATH` environment variable and you can run them from command prompt.
+## How to build Nim sampels
+Make sure parent directories of `nim` and `crinker` are in `PATH` environment variable and you can run them from command prompt.
 1. Set `LIB` environment variable to the directory containing `*.lib` files to use Windows API.
    - For example:
    ```console
@@ -39,6 +43,22 @@ Make sure parent directories of `nim` and `crinker` in `PATH` environment variab
    ```console
    nim c minimum.nim
    ```
+
+## How to build C samples
+Make sure parent directories of `nim` and `crinker` are in `PATH` environment variable and you can run them from command prompt.
+1. Run VS2015 x86 Native Tools command prompt
+1. Set `INCLUDE` environment variable to the directory containing OpenGL Extension Header Files(`GL/glext.h`, `GL/wglext.h` and `KHR/khrplatform.h`).
+   - For example:
+   ```console
+   set INCLUDE=c:\path\to\include;%INCLUDE%
+   ```
+1. Build
+   ```console
+   git clone https://github.com/demotomohiro/nim-4k-intro-sample.git
+   cd nim-4k-intro-sample\csrc
+   minimum_build.bat
+   ```
+   - Each `*_build.bat` files builds each samples.
 
 ## Directory structure
 - csrc
