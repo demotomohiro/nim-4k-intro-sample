@@ -4,6 +4,7 @@ This sample is written for MS Windows.
 
 ## Build tools
 - [Nim](https://nim-lang.org/)
+  - Current sample requires devel version. You can download it from [nim-lang/nightlies](https://github.com/nim-lang/nightlies/releases)
 - Visual Studio 2015
 - [Crinkler](http://crinkler.net/)
 
