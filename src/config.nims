@@ -1,3 +1,6 @@
+# Build configuration file used by all *.nim files in this directory.
+# Other *.nims files contain options specific to each samples.
+
 --cc:vcc
 --d:noAutoGLerrorCheck
 --cpu:i386
