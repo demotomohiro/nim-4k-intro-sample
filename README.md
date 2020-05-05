@@ -73,7 +73,10 @@ Make sure parent directories of `nim` and `crinker` are in `PATH` environment va
   - Tools used for making 4k intros with Nim
 
 ## openGL4kGen
-It download and read the OpenGL Registry XML file and generate a OpenGL wrapper optimized for 4k-intro.
+It downloads and reads the OpenGL Registry XML file and generates a OpenGL wrapper optimized for 4k-intro.
+It imports OpenGL 1.0 and 1.1 functions with header pragma.
+Like [Official OpenGL interface](https://github.com/nim-lang/opengl), it uses undocumented 'dynlib' feature and Nim generate a  procedure that load only OpenGL extension functions used in user code. So `loadExtensions()` must be called after the creation of an OpenGL context and before any OpenGL extension procs are used.
+It only generates procedures and enums in OpenGL core profile.
 
 ### How to use openGL4kGen
 Following code build openGL4kGen and generate OpenGL wrapper.
