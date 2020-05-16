@@ -1,4 +1,6 @@
 #version 420
+out gl_PerVertex {vec4 gl_Position;};
+
 void main()
 {
 	if(gl_VertexID == 0)

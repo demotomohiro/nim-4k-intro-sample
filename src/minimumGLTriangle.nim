@@ -48,39 +48,20 @@ proc initScreen(): auto {.inline.} =
 
   return hdc
 
-proc createShader(source:cstring, shaderType: GLEnum): GLuint {.inline.}=
-  result = glCreateShader(shaderType)
+proc createShaderProgram(source:cstring, shaderType: GLEnum): GLuint {.inline.}=
+  result = glCreateShaderProgramv(shaderType, 1, cast[cstringArray](unsafeAddr source))
   assert result != 0
-  glShaderSource(result, 1, cast[cstringArray](unsafeAddr source), nil)
-  glCompileShader(result)
   when not defined(danger):
     var logLen: GLint
-    glGetShaderiv(result, GL_INFO_LOG_LENGTH, addr logLen)
+    glGetProgramiv(result, GL_INFO_LOG_LENGTH, addr logLen)
     if logLen != 0:
       var log = newseq[int8](logLen)
-      glGetShaderInfoLog(result, logLen, nil, cast[cstring](addr log[0]))
-      echo "Message from OpenGL shader compiler:"
-      echo cast[cstring](addr log[0])
-
-    var compileStatus: GLint
-    glGetShaderiv(result, GL_COMPILE_STATUS, addr compileStatus)
-    if compileStatus != cast[GLint](GL_TRUE):
-      quit "Failed to compile shader"
-
-proc linkProgramObj(progObj: GLuint) =
-  glLinkProgram(progObj)
-
-  when not defined(danger):
-    var logLen: GLint
-    glGetProgramiv(progObj, GL_INFO_LOG_LENGTH, addr logLen)
-    if logLen != 0:
-      var log = newseq[int8](logLen)
-      glGetProgramInfoLog(progObj, logLen, nil, cast[cstring](addr log[0]))
+      glGetProgramInfoLog(result, logLen, nil, cast[cstring](addr log[0]))
       echo "Message from OpenGL shader compiler:"
       echo cast[cstring](addr log[0])
 
     var success: GLint
-    glGetProgramiv(progObj, GL_LINK_STATUS, addr success)
+    glGetProgramiv(result, GL_LINK_STATUS, addr success)
     if success != cast[GLint](GL_TRUE):
       quit "Failed to link shader"
 
@@ -88,13 +69,13 @@ const triangleVSSrc = staticRead("../shaders/triangle.vs").cstring
 const triangleFSSrc = staticRead("../shaders/triangle.fs").cstring
 
 proc initScene() {.forceInline.} =
-  let vso = createShader(triangleVSSrc, GL_VERTEX_SHADER)
-  let fso = createShader(triangleFSSrc, GL_FRAGMENT_SHADER)
-  let progObj = glCreateProgram()
-  glAttachShader(progObj, vso)
-  glAttachShader(progObj, fso)
-  progObj.linkProgramObj()
-  glUseProgram(progObj)
+  let vpo = createShaderProgram(triangleVSSrc, GL_VERTEX_SHADER)
+  let fpo = createShaderProgram(triangleFSSrc, GL_FRAGMENT_SHADER)
+  var pipeObj: GLuint
+  glCreateProgramPipelines(1, addr pipeObj)
+  glUseProgramStages(pipeObj, GL_VERTEX_SHADER_BIT, vpo)
+  glUseProgramStages(pipeObj, GL_FRAGMENT_SHADER_BIT, fpo)
+  glBindProgramPipeline(pipeObj)
 
 proc WinMainCRTStartup() {.exportc.} =
   let hdc = initScreen()
