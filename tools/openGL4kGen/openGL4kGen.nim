@@ -1,6 +1,6 @@
-import os, httpclient, strformat, strutils, xmlparser, xmltree
+import os, httpclient, strformat, strutils, xmlparser, xmltree, sugar
 import parseopt, sets, with
-import ../../compiler/wordrecg
+import "$nim"/compiler/wordrecg
 
 iterator elements(n: XmlNode): XmlNode =
   for i in items(n):
@@ -87,8 +87,9 @@ proc outputExportAPI(ca: var ExportAPI; fout: File; node: XmlNode) =
     needPrefixEnums = toHashSet(
       ["GL_BYTE", "GL_SHORT", "GL_INT", "GL_FLOAT", "GL_DOUBLE", "GL_FIXED"])
     #Get Nim keywords using compiler/wordrecg
-    nimKeywords = toHashSet(
-      specialWords[TSpecialWord.low.succ..nimKeywordsHigh.TSpecialWord])
+    nimKeywords = collect(initHashSet()):
+      for i in TSpecialWord.low.succ..nimKeywordsHigh.TSpecialWord:
+        {$i}
 
   fout.write "const\n"
   for i in elements(node):
@@ -188,7 +189,7 @@ proc downloadXml(url, filename: string): XmlNode =
   return loadXml(filename)
 
 proc wgl(fout: File) =
-  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/wgl.xml", "wgl.xml")
+  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/main/xml/wgl.xml", "wgl.xml")
 
   # Commonly used WGL extensions.
   const wglExts = ["WGL_ARB_create_context", "WGL_ARB_create_context_profile", "WGL_EXT_swap_control"].toHashSet
@@ -209,7 +210,7 @@ proc main() =
     of cmdEnd: assert(false) # cannot happen
 
   # https://github.com/KhronosGroup/OpenGL-Registry
-  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/master/xml/gl.xml", "gl.xml")
+  let node = downloadXml("https://github.com/KhronosGroup/OpenGL-Registry/raw/main/xml/gl.xml", "gl.xml")
 
   var ca: ExportAPI
   ca.loadExportAPI(node)
